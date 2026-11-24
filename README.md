@@ -2,9 +2,11 @@
 
 *Companies worth mentioning.*
 
+Live at https://studio.sonyasupposedly.com/startups/
+
 A live board of the 100 startups most recently mentioned in Hacker News comments, shown as a clump of soap bubbles. Each bubble is sized by its mentions over the last 30 days, counting each commenter once per thread. Tap a bubble to see what the company does and the latest comment that mentioned it. Drag one bubble onto another to merge them into a satirical startup, or feed one to a Big Tech mouth.
 
-Live at https://studio.sonyasupposedly.com/startups/. [SPEC.md](SPEC.md) has the full design and the reasoning behind it.
+[SPEC.md](SPEC.md) has the full design and the reasoning behind it.
 
 ## How it works
 
