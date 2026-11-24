@@ -1,0 +1,24 @@
+[Unit]
+Description=The Last 100 Startups (page, merge API, permalinks)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=startups
+Group=startups
+WorkingDirectory=/srv/startups/app
+EnvironmentFile=/srv/startups/env
+# Kimi allows 200 requests/minute for the whole account; the live merges
+# get 60 of them, the pipeline timer 120.
+Environment=HOST=127.0.0.1 PORT=3003 TRUST_PROXY=1 NODE_ENV=production KIMI_RPM=60
+ExecStart=/usr/local/bin/node --disable-warning=ExperimentalWarning src/web/server.ts
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/startups/app/data
+
+[Install]
+WantedBy=multi-user.target

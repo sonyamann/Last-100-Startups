@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>The Last 100 Startups</title>
+    <meta name="description" content="The last 100 startups mentioned by Hacker News commenters, as a clump of soap bubbles. Poke them, merge them, feed them to Big Tech." />
+    <meta name="theme-color" content="#05060a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Supposedly Studio" />
+    <meta property="og:title" content="The Last 100 Startups" />
+    <meta property="og:description" content="The startups Hacker News keeps mentioning, as a clump of soap bubbles. Poke them, merge them, feed them to Big Tech." />
+    <meta property="og:url" content="https://studio.sonyasupposedly.com/startups/" />
+    <meta property="og:image" content="https://studio.sonyasupposedly.com/startups/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="The Last 100 Startups: a clump of iridescent soap bubbles, each labelled with a startup's name" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="The Last 100 Startups" />
+    <meta name="twitter:description" content="The startups Hacker News keeps mentioning, as a clump of soap bubbles. Poke them, merge them, feed them to Big Tech." />
+    <meta name="twitter:image" content="https://studio.sonyasupposedly.com/startups/og.png" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@300..700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./src/styles.css" />
+    <!-- Google Analytics 4, on the live site only (not in development). -->
+    <script>
+      if (/(^|\.)sonyasupposedly\.com$/.test(location.hostname)) {
+        var ga = document.createElement("script");
+        ga.async = true;
+        ga.src = "https://www.googletagmanager.com/gtag/js?id=G-TLGPPRF6DF";
+        document.head.appendChild(ga);
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { dataLayer.push(arguments); };
+        gtag("js", new Date());
+        gtag("config", "G-TLGPPRF6DF");
+      }
+    </script>
+  </head>
+  <body>
+    <header class="masthead">
+      <h1>The Last 100 Startups</h1>
+      <p class="subtitle">Companies worth mentioning.</p>
+      <p class="meta" id="meta" aria-live="polite"></p>
+      <button class="about-button" id="about" type="button" aria-haspopup="dialog">
+        <span class="about-button__icon" aria-hidden="true">i</span>What counts as a startup?
+      </button>
+    </header>
+
+    <main>
+      <ul class="hint" id="hint" aria-label="How to play"></ul>
+      <section class="clump" id="clump" aria-label="The last 100 startups mentioned on Hacker News, most recent first">
+        <p class="clump__loading">Blowing bubbles…</p>
+      </section>
+      <section class="acquirers" id="acquirers" aria-label="Big Tech acquirers: drag a startup into one to sell it"></section>
+      <section class="devoured" id="devoured" aria-labelledby="devoured-title" hidden></section>
+    </main>
+
+    <footer class="outro">
+      <div class="outro__ctas">
+        <section class="cta cta--hire" aria-labelledby="hire-title">
+          <h2 id="hire-title">Do you need attention?</h2>
+          <p>Don't we all, my friend, don't we all. Thus it is written in the scriptures that <em>attention is all you need</em>.</p>
+          <p class="cta__pitch">
+            <span>Luckily I can help out 🫶</span> <span>→ <a id="hire-me" href="mailto:hello@sonya.email?subject=Saw%20Last%20100%20Startups">hello@sonya.email</a></span>
+          </p>
+        </section>
+
+        <section class="cta cta--newsletter" aria-labelledby="newsletter-title">
+          <h2 id="newsletter-title">Bubble enthusiast?</h2>
+          <p>Great, sign up for my <a href="https://www.sonyasupposedly.com/">newsletter</a>. Emails are very occasional.</p>
+          <form class="cta__form" id="newsletter" novalidate>
+            <label class="visually-hidden" for="newsletter-email">Email address</label>
+            <input id="newsletter-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+            <!-- Honeypot: people never see or fill this; bots do. -->
+            <input class="visually-hidden" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button type="submit">Subscribe</button>
+          </form>
+          <p class="cta__fine">Ghost sends a confirmation email first. Unsubscribe anytime.</p>
+          <p class="cta__status" id="newsletter-status" aria-live="polite"></p>
+        </section>
+      </div>
+
+      <!-- Sonya's rabbit sigil, traced from her linocut and given the 2010s
+           startup app-icon treatment, as the divider above the byline. -->
+      <div class="sigil-divider" role="separator">
+        <span class="sigil-divider__line"></span>
+        <svg class="sigil" viewBox="0 0 120 120" aria-hidden="true">
+          <defs>
+            <linearGradient id="sigil-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7fa9c9"/>
+      <stop offset="0.28" stop-color="#6fb39a"/>
+      <stop offset="0.55" stop-color="#82b8a6"/>
+      <stop offset="0.8" stop-color="#c993b4"/>
+      <stop offset="1" stop-color="#b98abf"/>
+    </linearGradient>
+    <radialGradient id="sigil-sun" cx="0.8" cy="0.26" r="0.42">
+      <stop offset="0" stop-color="#f3dc7a" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#f3dc7a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sigil-sun-2" cx="0.16" cy="0.84" r="0.3">
+      <stop offset="0" stop-color="#ead27a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ead27a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sigil-beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff2b8" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#fff2b8" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#fff2b8" stop-opacity="0"/>
+    </linearGradient>
+            <linearGradient id="sigil-gloss" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.32"/>
+              <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </linearGradient>
+            <clipPath id="sigil-tile"><rect width="120" height="120" rx="28"/></clipPath>
+            <path id="sigil-rabbit" transform="translate(15.89 25.33) scale(0.1458)" d="M217.0 23.0 C224.2 19.5 223.5 22.5 225.0 24.0 C226.5 25.5 231.0 21.8 226.0 32.0 C221.0 42.2 208.7 65.2 195.0 85.0 C181.3 104.8 154.0 139.5 144.0 151.0 C134.0 162.5 137.7 155.2 135.0 154.0 C132.3 152.8 128.8 148.2 128.0 144.0 C127.2 139.8 125.7 140.0 130.0 129.0 C134.3 118.0 145.3 92.0 154.0 78.0 C162.7 64.0 171.5 54.2 182.0 45.0 C192.5 35.8 209.8 26.5 217.0 23.0Z M282.0 64.0 C296.0 57.2 285.3 64.7 286.0 66.0 C286.7 67.3 288.8 66.5 286.0 72.0 C283.2 77.5 281.8 85.7 269.0 99.0 C256.2 112.3 224.0 139.7 209.0 152.0 C194.0 164.3 185.5 168.0 179.0 173.0 C172.5 178.0 171.7 178.7 170.0 182.0 C168.3 185.3 164.8 184.7 169.0 193.0 C173.2 201.3 186.5 226.7 195.0 232.0 C203.5 237.3 205.5 226.8 220.0 225.0 C234.5 223.2 251.3 216.7 282.0 221.0 C312.7 225.3 379.2 247.2 404.0 251.0 C428.8 254.8 423.8 248.0 431.0 244.0 C438.2 240.0 443.8 228.7 447.0 227.0 C450.2 225.3 450.2 230.8 450.0 234.0 C449.8 237.2 449.8 240.8 446.0 246.0 C442.2 251.2 429.8 259.2 427.0 265.0 C424.2 270.8 423.0 271.0 429.0 281.0 C435.0 291.0 453.5 315.8 463.0 325.0 C472.5 334.2 479.7 331.5 486.0 336.0 C492.3 340.5 493.0 348.8 501.0 352.0 C509.0 355.2 526.8 353.3 534.0 355.0 C541.2 356.7 537.2 350.0 544.0 362.0 C550.8 374.0 568.8 409.8 575.0 427.0 C581.2 444.2 583.7 456.0 581.0 465.0 C578.3 474.0 563.8 478.5 559.0 481.0 C554.2 483.5 554.5 481.5 552.0 480.0 C549.5 478.5 545.3 475.5 544.0 472.0 C542.7 468.5 541.5 463.2 544.0 459.0 C546.5 454.8 556.3 449.8 559.0 447.0 C561.7 444.2 563.3 450.2 560.0 442.0 C556.7 433.8 546.5 407.7 539.0 398.0 C531.5 388.3 520.0 385.7 515.0 384.0 C510.0 382.3 510.0 386.3 509.0 388.0 C508.0 389.7 506.0 386.8 509.0 394.0 C512.0 401.2 523.2 420.5 527.0 431.0 C530.8 441.5 532.0 451.5 532.0 457.0 C532.0 462.5 530.8 461.2 527.0 464.0 C523.2 466.8 513.8 472.7 509.0 474.0 C504.2 475.3 500.7 473.7 498.0 472.0 C495.3 470.3 491.7 468.3 493.0 464.0 C494.3 459.7 503.7 450.5 506.0 446.0 C508.3 441.5 510.7 447.2 507.0 437.0 C503.3 426.8 490.0 395.3 484.0 385.0 C478.0 374.7 477.7 378.0 471.0 375.0 C464.3 372.0 457.5 372.7 444.0 367.0 C430.5 361.3 403.7 350.5 390.0 341.0 C376.3 331.5 369.2 316.5 362.0 310.0 C354.8 303.5 352.5 303.3 347.0 302.0 C341.5 300.7 342.8 299.0 329.0 302.0 C315.2 305.0 283.7 315.8 264.0 320.0 C244.3 324.2 226.0 323.5 211.0 327.0 C196.0 330.5 187.8 341.7 174.0 341.0 C160.2 340.3 140.3 325.8 128.0 323.0 C115.7 320.2 108.0 322.2 100.0 324.0 C92.0 325.8 86.2 328.8 80.0 334.0 C73.8 339.2 67.8 351.0 63.0 355.0 C58.2 359.0 54.2 358.0 51.0 358.0 C47.8 358.0 44.7 358.2 44.0 355.0 C43.3 351.8 41.3 346.7 47.0 339.0 C52.7 331.3 71.2 314.7 78.0 309.0 C84.8 303.3 78.0 306.0 88.0 305.0 C98.0 304.0 128.7 304.5 138.0 303.0 C147.3 301.5 144.3 298.7 144.0 296.0 C143.7 293.3 147.0 289.0 136.0 287.0 C125.0 285.0 90.5 283.5 78.0 284.0 C65.5 284.5 67.2 286.5 61.0 290.0 C54.8 293.5 46.0 302.5 41.0 305.0 C36.0 307.5 34.2 306.0 31.0 305.0 C27.8 304.0 22.7 301.8 22.0 299.0 C21.3 296.2 21.5 292.7 27.0 288.0 C32.5 283.3 47.0 274.7 55.0 271.0 C63.0 267.3 66.0 266.3 75.0 266.0 C84.0 265.7 102.3 269.2 109.0 269.0 C115.7 268.8 114.5 267.7 115.0 265.0 C115.5 262.3 114.3 257.0 112.0 253.0 C109.7 249.0 112.2 247.0 101.0 241.0 C89.8 235.0 55.3 224.2 45.0 217.0 C34.7 209.8 39.3 203.2 39.0 198.0 C38.7 192.8 39.5 189.7 43.0 186.0 C46.5 182.3 54.5 177.8 60.0 176.0 C65.5 174.2 66.7 177.2 76.0 175.0 C85.3 172.8 105.0 164.5 116.0 163.0 C127.0 161.5 131.0 172.7 142.0 166.0 C153.0 159.3 172.0 132.8 182.0 123.0 C192.0 113.2 185.3 116.8 202.0 107.0 C218.7 97.2 268.0 70.8 282.0 64.0Z"/>
+          </defs>
+          <g clip-path="url(#sigil-tile)">
+            <rect width="120" height="120" fill="url(#sigil-bg)"/>
+    <rect width="120" height="120" fill="url(#sigil-sun)"/>
+    <rect width="120" height="120" fill="url(#sigil-sun-2)"/>
+    <rect x="52" y="-40" width="26" height="200" fill="url(#sigil-beam)" transform="rotate(24 60 60)"/>
+            <g fill="#2c4a46" fill-opacity="0.05">
+              <use href="#sigil-rabbit" transform="translate(0.5 0.5)"/>
+              <use href="#sigil-rabbit" transform="translate(1 1)"/>
+              <use href="#sigil-rabbit" transform="translate(1.5 1.5)"/>
+              <use href="#sigil-rabbit" transform="translate(2 2)"/>
+              <use href="#sigil-rabbit" transform="translate(2.5 2.5)"/>
+              <use href="#sigil-rabbit" transform="translate(3 3)"/>
+              <use href="#sigil-rabbit" transform="translate(3.5 3.5)"/>
+              <use href="#sigil-rabbit" transform="translate(4 4)"/>
+              <use href="#sigil-rabbit" transform="translate(4.5 4.5)"/>
+              <use href="#sigil-rabbit" transform="translate(5 5)"/>
+              <use href="#sigil-rabbit" transform="translate(5.5 5.5)"/>
+              <use href="#sigil-rabbit" transform="translate(6 6)"/>
+              <use href="#sigil-rabbit" transform="translate(6.5 6.5)"/>
+              <use href="#sigil-rabbit" transform="translate(7 7)"/>
+              <use href="#sigil-rabbit" transform="translate(7.5 7.5)"/>
+              <use href="#sigil-rabbit" transform="translate(8 8)"/>
+              <use href="#sigil-rabbit" transform="translate(8.5 8.5)"/>
+              <use href="#sigil-rabbit" transform="translate(9 9)"/>
+              <use href="#sigil-rabbit" transform="translate(9.5 9.5)"/>
+              <use href="#sigil-rabbit" transform="translate(10 10)"/>
+              <use href="#sigil-rabbit" transform="translate(10.5 10.5)"/>
+              <use href="#sigil-rabbit" transform="translate(11 11)"/>
+              <use href="#sigil-rabbit" transform="translate(11.5 11.5)"/>
+              <use href="#sigil-rabbit" transform="translate(12 12)"/>
+              <use href="#sigil-rabbit" transform="translate(12.5 12.5)"/>
+              <use href="#sigil-rabbit" transform="translate(13 13)"/>
+              <use href="#sigil-rabbit" transform="translate(13.5 13.5)"/>
+              <use href="#sigil-rabbit" transform="translate(14 14)"/>
+              <use href="#sigil-rabbit" transform="translate(14.5 14.5)"/>
+              <use href="#sigil-rabbit" transform="translate(15 15)"/>
+              <use href="#sigil-rabbit" transform="translate(15.5 15.5)"/>
+              <use href="#sigil-rabbit" transform="translate(16 16)"/>
+              <use href="#sigil-rabbit" transform="translate(16.5 16.5)"/>
+              <use href="#sigil-rabbit" transform="translate(17 17)"/>
+              <use href="#sigil-rabbit" transform="translate(17.5 17.5)"/>
+              <use href="#sigil-rabbit" transform="translate(18 18)"/>
+              <use href="#sigil-rabbit" transform="translate(18.5 18.5)"/>
+              <use href="#sigil-rabbit" transform="translate(19 19)"/>
+              <use href="#sigil-rabbit" transform="translate(19.5 19.5)"/>
+              <use href="#sigil-rabbit" transform="translate(20 20)"/>
+              <use href="#sigil-rabbit" transform="translate(20.5 20.5)"/>
+              <use href="#sigil-rabbit" transform="translate(21 21)"/>
+              <use href="#sigil-rabbit" transform="translate(21.5 21.5)"/>
+              <use href="#sigil-rabbit" transform="translate(22 22)"/>
+              <use href="#sigil-rabbit" transform="translate(22.5 22.5)"/>
+              <use href="#sigil-rabbit" transform="translate(23 23)"/>
+              <use href="#sigil-rabbit" transform="translate(23.5 23.5)"/>
+              <use href="#sigil-rabbit" transform="translate(24 24)"/>
+              <use href="#sigil-rabbit" transform="translate(24.5 24.5)"/>
+              <use href="#sigil-rabbit" transform="translate(25 25)"/>
+              <use href="#sigil-rabbit" transform="translate(25.5 25.5)"/>
+              <use href="#sigil-rabbit" transform="translate(26 26)"/>
+              <use href="#sigil-rabbit" transform="translate(26.5 26.5)"/>
+              <use href="#sigil-rabbit" transform="translate(27 27)"/>
+              <use href="#sigil-rabbit" transform="translate(27.5 27.5)"/>
+              <use href="#sigil-rabbit" transform="translate(28 28)"/>
+              <use href="#sigil-rabbit" transform="translate(28.5 28.5)"/>
+              <use href="#sigil-rabbit" transform="translate(29 29)"/>
+              <use href="#sigil-rabbit" transform="translate(29.5 29.5)"/>
+              <use href="#sigil-rabbit" transform="translate(30 30)"/>
+              <use href="#sigil-rabbit" transform="translate(30.5 30.5)"/>
+              <use href="#sigil-rabbit" transform="translate(31 31)"/>
+              <use href="#sigil-rabbit" transform="translate(31.5 31.5)"/>
+              <use href="#sigil-rabbit" transform="translate(32 32)"/>
+              <use href="#sigil-rabbit" transform="translate(32.5 32.5)"/>
+              <use href="#sigil-rabbit" transform="translate(33 33)"/>
+              <use href="#sigil-rabbit" transform="translate(33.5 33.5)"/>
+              <use href="#sigil-rabbit" transform="translate(34 34)"/>
+              <use href="#sigil-rabbit" transform="translate(34.5 34.5)"/>
+              <use href="#sigil-rabbit" transform="translate(35 35)"/>
+              <use href="#sigil-rabbit" transform="translate(35.5 35.5)"/>
+              <use href="#sigil-rabbit" transform="translate(36 36)"/>
+              <use href="#sigil-rabbit" transform="translate(36.5 36.5)"/>
+              <use href="#sigil-rabbit" transform="translate(37 37)"/>
+              <use href="#sigil-rabbit" transform="translate(37.5 37.5)"/>
+              <use href="#sigil-rabbit" transform="translate(38 38)"/>
+              <use href="#sigil-rabbit" transform="translate(38.5 38.5)"/>
+              <use href="#sigil-rabbit" transform="translate(39 39)"/>
+              <use href="#sigil-rabbit" transform="translate(39.5 39.5)"/>
+              <use href="#sigil-rabbit" transform="translate(40 40)"/>
+            </g>
+            <use href="#sigil-rabbit" fill="#fff"/>
+            <path d="M0 0H120V46C80 58 40 58 0 46Z" fill="url(#sigil-gloss)"/>
+          </g>
+          <path class="sigil__spark" d="M101 10l2.2 6.3 6.3 2.2-6.3 2.2-2.2 6.3-2.2-6.3-6.3-2.2 6.3-2.2z" fill="#fff1c2"/>
+          <path class="sigil__spark sigil__spark--2" d="M16 92l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4z" fill="#fff1c2" opacity="0.9"/>
+        </svg>
+        <span class="sigil-divider__line"></span>
+      </div>
+      <p class="byline">
+        A <a href="https://studio.sonyasupposedly.com/">Supposedly Studio</a> project by
+        <a href="https://x.com/sonyasupposedly">Sonya Mann</a>.
+      </p>
+      <p class="credits">
+        Mentions come from Hacker News comments and Show/Launch HN posts; startup details from public web reports.
+        Mergers, investors, and acquisitions-by-mouth are satire.
+      </p>
+    </footer>
+
+    <div class="card" id="card" role="dialog" aria-modal="false" aria-labelledby="card-name" hidden></div>
+    <div class="scrim" id="scrim" hidden></div>
+
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

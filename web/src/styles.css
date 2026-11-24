@@ -1,0 +1,1094 @@
+/* Last 100 Startups: soap bubbles on a near-black ground. The page is
+   always dark: the bubbles are a thin film catching light, and that needs a
+   dark backdrop (see the reference photo in SPEC.md). */
+
+:root {
+  color-scheme: dark;
+  --bg: #05060a;
+  --bg-2: #0b0d14;
+  --ink: #eef1f8;
+  --ink-2: #a7aec0;
+  --ink-3: #6f7689;
+  --line: rgba(255, 255, 255, 0.12);
+  --card: rgba(16, 18, 27, 0.92);
+  --accent: #9fd8ff;
+  --loved: #8ff0b8;
+  --roasted: #ff9a8a;
+  --mixed: #f3d27a;
+  --fantasy: #ff4fae;
+  --serif: "Instrument Serif", ui-serif, Georgia, serif;
+  /* Handjet (dot-matrix): the masthead title and company names on cards. */
+  --display: "Handjet", var(--serif);
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --gutter: clamp(16px, 4vw, 48px);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  background:
+    radial-gradient(1200px 700px at 50% 30%, #0e1120 0%, transparent 70%),
+    var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body.sheet-open { overflow: hidden; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+
+.masthead {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 64px) var(--gutter) 8px;
+  text-align: center;
+}
+
+.masthead h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(44px, 9vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  margin: 0;
+  background: linear-gradient(100deg, #f6f7ff 20%, #b9e6ff 40%, #ffd1ec 55%, #fff4c9 70%, #f6f7ff 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(23px, 3vw, 30px);
+  color: var(--ink-2);
+  margin: 12px 0 0;
+}
+
+.meta__updated { font-style: italic; color: var(--ink-3); white-space: nowrap; }
+
+.meta {
+  font-size: clamp(15px, 1.9vw, 17px);
+  color: var(--ink-2);
+  margin: 16px auto 0;
+  max-width: 34em;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--gutter) 64px;
+}
+
+/* How to play: a short bullet list, left-aligned, centred as a block. */
+.hint {
+  width: fit-content;
+  max-width: 34em;
+  margin: 18px auto 22px;
+  padding: 0 0 0 1.3em;
+  font-size: clamp(15px, 1.8vw, 16px);
+  line-height: 1.5;
+  color: var(--ink-2);
+  min-height: 1.5em;
+}
+.hint li { margin: 3px 0; }
+.hint li::marker { color: var(--fantasy); }
+
+/* --- The clump ------------------------------------------------------------ */
+
+.clump {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.clump__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--ink-3);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+}
+
+.clump.is-dragging { cursor: grabbing; }
+
+/* --- A bubble ------------------------------------------------------------------
+   Real soap film is clear in the middle; the colour lives near the edge,
+   with a bright window reflection up top. Layers, back to front:
+   1. background: an almost clear body, a crisp white highlight top-left
+      and a faint cool reflection bottom-right;
+   2. .pill__film: a slowly turning rainbow swirl, masked so it shows only
+      toward the rim;
+   3. ::after: a thin iridescent rim (a conic gradient masked to a ring);
+   4. the name.
+   Only transform animates (the swirl's rotation), so it stays on the
+   compositor. */
+
+.pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 45%; /* each bubble gets its own uneven rounding from main.ts */
+  font: 500 1em/1.05 var(--sans);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  text-align: center;
+  color: #f7f9ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 0, 0, 0.45);
+  background:
+    radial-gradient(38% 30% at 24% 22%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 60%, transparent 100%),
+    radial-gradient(30% 26% at 80% 84%, rgba(190, 235, 255, 0.18), transparent 100%),
+    rgba(255, 255, 255, 0.012);
+  box-shadow:
+    inset 0 1px 0.5px rgba(255, 255, 255, 0.5),
+    inset 0 -1px 4px rgba(150, 230, 255, 0.12),
+    0 8px 22px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  isolation: isolate;
+  cursor: grab;
+  touch-action: pan-y;
+  will-change: transform;
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 160ms ease, box-shadow 160ms ease;
+}
+
+.pill__film {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(closest-side, transparent 0%, transparent 56%, rgba(0, 0, 0, 0.5) 80%, #000 100%);
+  mask-image: radial-gradient(closest-side, transparent 0%, transparent 56%, rgba(0, 0, 0, 0.5) 80%, #000 100%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  /* No mix-blend-mode here: "screen" on this masked, rotating layer made
+     Chrome draw hairlines along the bubble's box. On the near-black page it
+     looked the same without it. */
+}
+
+.pill__film::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 160%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(from var(--hue, 0deg),
+    #ff5fa8, #ffc85e, #6dffa9, #4fcbff, #9c7dff, #ff5fa8 50%,
+    #ffd36e, #74ffc2, #5ab8ff, #c08bff, #ff5fa8);
+  opacity: 0.5;
+  filter: blur(3px);
+  animation: film var(--dur, 12s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.pill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.25px;
+  background: conic-gradient(from var(--hue, 0deg),
+    rgba(255, 120, 185, 0.95), rgba(255, 214, 120, 0.9), rgba(130, 255, 195, 0.9),
+    rgba(110, 205, 255, 0.95), rgba(185, 145, 255, 0.95), rgba(255, 120, 185, 0.95));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.pill__name { position: relative; }
+.pill__name--wrap {
+  white-space: normal;
+  max-width: 5.6em;
+  text-wrap: balance;
+}
+
+@keyframes film {
+  to { rotate: 360deg; }
+}
+
+@media (hover: hover) {
+  .pill:hover {
+    filter: brightness(1.25) saturate(1.2);
+  }
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.pill.is-dragging {
+  cursor: grabbing;
+  filter: brightness(1.3) saturate(1.3);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    0 14px 34px rgba(0, 0, 0, 0.6),
+    0 0 28px rgba(160, 220, 255, 0.25);
+  /* Above the mouth row, which sticks to the bottom of the screen at z-index
+     5 while dragging; at 2 the bubble slid behind it on its way to a mouth.
+     Same layer as a bubble being eaten (12); under the card and scrim. */
+  z-index: 12;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill__film::before { animation: none; }
+}
+
+/* --- The card ------------------------------------------------------------------ */
+
+.card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 20;
+  width: min(360px, calc(100vw - 24px));
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  pointer-events: none;
+}
+
+.card.is-pinned { pointer-events: auto; }
+.card[hidden] { display: none; }
+
+.card__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+}
+.card.is-pinned .card__close { display: block; }
+.card__close:hover { background: rgba(255, 255, 255, 0.08); color: var(--ink); }
+
+.card__head { padding-right: 28px; }
+
+.card__name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1.05;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.card__site {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.card__oneliner { margin: 10px 0 0; color: var(--ink); }
+
+.card__facts { margin: 8px 0 0; color: var(--ink-2); font-size: 13px; }
+
+.card__funding {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.card__funding strong { color: var(--ink); font-weight: 600; font-size: 15px; }
+.card__investors { margin-top: 4px; }
+.card__fineprint { margin-top: 4px; font-size: 11px; color: var(--ink-3); }
+
+.card__mentions { margin: 12px 0 0; font-size: 13px; color: var(--ink-2); }
+.card__mentions strong { color: var(--ink); font-weight: 600; }
+
+.lean { font-weight: 600; }
+.lean--loved { color: var(--loved); }
+.lean--roasted { color: var(--roasted); }
+.lean--mixed { color: var(--mixed); }
+
+.card__quote {
+  margin: 10px 0 0;
+  padding: 0 0 0 12px;
+  border-left: 2px solid rgba(160, 215, 255, 0.35);
+}
+.card__quote p { margin: 0; font-family: var(--serif); font-size: 18px; line-height: 1.3; color: var(--ink); }
+.card__quote footer { margin-top: 6px; font-size: 12px; color: var(--ink-3); }
+.card__quote cite { font-style: normal; color: var(--ink-2); }
+
+/* Phones: a bottom sheet over a scrim. */
+.card.card--sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: auto;
+  bottom: 0;
+  width: auto;
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: none !important;
+  border-radius: 22px 22px 0 0;
+  padding: 22px 20px calc(22px + env(safe-area-inset-bottom));
+  animation: sheet-up 220ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  background: rgba(0, 0, 0, 0.45);
+}
+.scrim[hidden] { display: none; }
+
+@keyframes sheet-up {
+  from { transform: translateY(40px) !important; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.card--sheet { animation: none; }
+}
+
+/* --- Merging (M4) -------------------------------------------------------------- */
+
+/* The bubble a dragged one would merge into. */
+.pill.is-target {
+  filter: brightness(1.45) saturate(1.4);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    0 0 0 2px rgba(255, 255, 255, 0.55),
+    0 0 34px rgba(170, 225, 255, 0.45);
+}
+
+/* Merged bubbles (made by visitors, not real): their own palette, neon
+   green with warm orange-gold iridescence, a bolder rim and a green glow, so
+   nobody mistakes them for the real startups. */
+.pill--mashup {
+  color: #f2fff5;
+  background:
+    radial-gradient(38% 30% at 24% 22%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 60%, transparent 100%),
+    radial-gradient(30% 26% at 80% 84%, rgba(255, 200, 90, 0.22), transparent 100%),
+    rgba(60, 255, 140, 0.07);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -2px 8px rgba(255, 190, 70, 0.18),
+    0 0 26px rgba(60, 255, 140, 0.32),
+    0 8px 22px rgba(0, 0, 0, 0.55);
+}
+.pill--mashup .pill__film::before {
+  background: conic-gradient(from var(--hue, 0deg),
+    #3dff8a, #c8ff3d, #ffd447, #ff9f2e, #ffcf5c, #57ffb0, #3dff8a 50%,
+    #e8ff4a, #ffb03a, #ff8a1f, #7dffb0, #3dff8a);
+  opacity: 0.7;
+}
+.pill--mashup::after {
+  opacity: 1;
+  padding: 2px;
+  background: conic-gradient(from var(--hue, 0deg),
+    #39ff8f, #d4ff3a, #ffd23f, #ff9a2f, #ffe08a, #39ff8f);
+}
+
+/* While the merger is being written, the bubble breathes. */
+.pill--pending {
+  cursor: progress;
+  animation: breathe 1.4s ease-in-out infinite;
+}
+.pill--pending .pill__name { opacity: 0.85; font-style: italic; }
+@keyframes breathe {
+  50% { filter: brightness(1.5) saturate(1.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill--pending { animation: none; }
+}
+
+.card__kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0 32px 10px 0;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* "Fantasy merger": loud on purpose, so nobody mistakes a mashup for a
+   real company. */
+.fantasy {
+  display: inline-block;
+  padding: 4px 11px 5px;
+  border-radius: 999px;
+  background: var(--fantasy);
+  color: #1c0010;
+  font: 700 12px/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, 0 0 18px rgba(255, 60, 170, 0.55);
+}
+
+.card__tagline {
+  margin: 4px 0 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 19px;
+  line-height: 1.25;
+  color: var(--ink-2);
+}
+
+.card__deal {
+  margin: 12px 0 2px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink-2);
+}
+
+/* The fake top HN comment, in HN's own colours. */
+.card__hn {
+  margin-top: 12px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #f6f6ef;
+  color: #000;
+  font: 12.5px/1.4 Verdana, Geneva, sans-serif;
+}
+.card__hn-user { color: #828282; font-size: 10.5px; margin-bottom: 3px; }
+
+.card__share {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.card__copy,
+.card__merge button {
+  font: 500 13px var(--sans);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.card__copy:hover,
+.card__merge button:hover { background: rgba(255, 255, 255, 0.14); }
+
+.card__merge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.card__merge select {
+  margin-left: 6px;
+  max-width: 180px;
+  font: 13px var(--sans);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+
+.card > .card__fineprint { margin-top: 12px; }
+
+/* --- Acquirers (M5) ------------------------------------------------------------- */
+
+/* --open (0 to 1) drives each jaw. Registered so the chomp keyframes can
+   animate it. */
+@property --open {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+.acquirers {
+  margin: 10px auto 0;
+  padding: 16px 0 18px;
+  text-align: center;
+}
+
+/* While a bubble is being dragged, the row sticks to the bottom of the
+   screen, so the mouths are reachable even from the top of a long clump. */
+.acquirers.is-active {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: linear-gradient(to top, rgba(5, 6, 10, 0.97) 72%, rgba(5, 6, 10, 0));
+}
+
+.acquirers__title {
+  margin: 0 0 14px;
+  font-family: var(--serif);
+  font-size: clamp(24px, 4vw, 32px); /* matches "Recently devoured" */
+  color: var(--ink-2);
+}
+
+.acquirers__row {
+  display: flex;
+  justify-content: center;
+  gap: clamp(4px, 1.6vw, 20px);
+}
+
+.mouth {
+  --open: 0;
+  width: clamp(44px, 12.5vw, 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.mouth__svg {
+  width: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+  animation: bob 3.2s ease-in-out infinite;
+  animation-delay: var(--blink-delay, 0s);
+}
+.mouth.is-target .mouth__svg { filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.45)); }
+
+.mouth__body { stroke: rgba(255, 255, 255, 0.28); stroke-width: 1.5; }
+.mouth__shine { fill: none; stroke: rgba(255, 255, 255, 0.55); stroke-width: 4; stroke-linecap: round; }
+.mouth__pupil { fill: #0a0b10; transform: translate(var(--lx, 0px), var(--ly, 0px)); transition: transform 120ms ease-out; }
+.mouth__lid {
+  transform-box: fill-box;
+  transform-origin: top;
+  transform: scaleY(0);
+  animation: blink 6.5s infinite;
+  animation-delay: var(--blink-delay, 0s);
+}
+
+/* The whole jaw (cavity, tongue, teeth) opens by stretching vertically
+   about its centre, so the teeth stay on the rim at every opening. */
+.mouth__jaw {
+  transform-box: view-box;
+  transform-origin: 60px 64px;
+  transform: scaleY(calc(0.07 + var(--open) * 0.93));
+}
+.mouth__cavity { fill: #1b0710; }
+.mouth__tongue { fill: #d9506f; }
+/* Teeth only appear once the mouth is properly open; when it's nearly
+   shut they'd be squashed slivers. */
+.mouth__teeth { fill: #fffaf2; opacity: clamp(0, calc((var(--open) - 0.12) * 3), 1); }
+.mouth__tongue { opacity: clamp(0, calc((var(--open) - 0.2) * 2.5), 1); }
+
+.mouth__name { margin-top: 4px; font-size: clamp(9.5px, 2.4vw, 13px); font-weight: 500; color: var(--ink-2); white-space: nowrap; }
+.mouth__count { min-height: 1.3em; font-size: clamp(8.5px, 2vw, 11px); color: var(--ink-3); white-space: nowrap; }
+
+.mouth.is-chomping { animation: chomp 650ms ease-in-out; }
+.mouth.is-chomping .mouth__svg { animation: none; }
+.mouth.is-burping .mouth__svg { animation: burp 900ms ease-out; }
+.mouth { position: relative; }
+.mouth.is-burping::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(190, 230, 255, 0.8);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.7), transparent 45%);
+  animation: burp-bubble 900ms ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes chomp {
+  0% { --open: 1; }
+  22% { --open: 0; }
+  42% { --open: 0.65; }
+  64% { --open: 0; }
+  100% { --open: 0; }
+}
+@keyframes burp {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.12, 0.92); }
+  55% { transform: scale(0.95, 1.06); }
+  100% { transform: scale(1); }
+}
+@keyframes burp-bubble {
+  0% { transform: translateY(0) scale(0.3); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-46px) scale(1); opacity: 0; }
+}
+@keyframes bob {
+  50% { transform: translateY(-3px); }
+}
+@keyframes blink {
+  0%, 95%, 100% { transform: scaleY(0); }
+  97% { transform: scaleY(1); }
+}
+
+.acquirers__toast {
+  display: flex;
+  justify-content: center;
+  margin: 14px auto 0;
+  min-height: 1px;
+  opacity: 0;
+}
+.acquirers__toast.is-shown { animation: toast 7.5s ease forwards; }
+@keyframes toast {
+  0% { opacity: 0; transform: translateY(8px) scale(0.94); }
+  5% { opacity: 1; transform: none; }
+  88% { opacity: 1; transform: none; }
+  100% { opacity: 0; }
+}
+
+/* The deal outcome, in the acquirer's colour. */
+.deal {
+  max-width: min(36em, 100%);
+  padding: 14px 20px 16px;
+  border-radius: 18px;
+  border: 1.5px solid var(--acq);
+  background:
+    radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--acq) 30%, transparent), transparent 70%),
+    color-mix(in srgb, var(--acq) 12%, #0b0d14);
+  box-shadow: 0 0 34px color-mix(in srgb, var(--acq) 35%, transparent), 0 14px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+.deal__kicker {
+  display: inline-block;
+  padding: 3px 10px 4px;
+  border-radius: 999px;
+  background: var(--acq);
+  color: #0b0d14;
+  font: 700 11.5px/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.deal__line {
+  margin: 8px 0 0;
+  font-family: var(--serif);
+  font-size: clamp(21px, 3.2vw, 28px);
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.acquirers__total { margin: 2px 0 0; font-size: 12px; color: var(--ink-3); min-height: 1.4em; }
+
+/* A bubble on its way into a mouth: it flies in and shrinks to fit the open
+   cavity (no fading), then gets squashed flat as the jaws shut. */
+.pill.is-eaten {
+  pointer-events: none;
+  z-index: 12;
+  transition: transform 440ms cubic-bezier(0.45, 0, 0.55, 1);
+}
+.pill.is-swallowed { animation: swallow 150ms ease-in forwards; }
+@keyframes swallow {
+  to { scale: 1.15 0.05; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mouth__svg, .mouth__lid { animation: none; }
+  .mouth.is-chomping, .mouth.is-burping .mouth__svg { animation: none; }
+  .mouth.is-burping::after { display: none; }
+  .acquirers__toast.is-shown { animation: none; opacity: 1; }
+}
+
+/* Idle: the mouths chew hungrily, out of step with each other. (Not while
+   a bubble is being dragged, when --open follows the pointer instead.) */
+.acquirers:not(.is-active) .mouth:not(.is-chomping) {
+  animation: hungry 3.6s ease-in-out infinite;
+  animation-delay: var(--blink-delay, 0s);
+}
+@keyframes hungry {
+  0%, 60%, 100% { --open: 0.05; }
+  70% { --open: 0.32; }
+  78% { --open: 0.08; }
+  86% { --open: 0.26; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .acquirers:not(.is-active) .mouth:not(.is-chomping) { animation: none; }
+}
+
+/* Narrow screens: long names (Microsoft, Salesforce) would run into each
+   other, so every other label drops a line. */
+@media (max-width: 520px) {
+  .mouth:nth-child(even) .mouth__name { margin-top: 16px; }
+}
+
+/* A standby startup blowing in to replace an eaten one. Uses the separate
+   `scale` property, since the physics owns `transform`. */
+.pill.is-new { animation: blow-in 700ms cubic-bezier(0.2, 1.4, 0.4, 1) 420ms both; }
+@keyframes blow-in {
+  from { scale: 0.15; opacity: 0; }
+  to { scale: 1; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill.is-new { animation: none; }
+}
+
+/* --- Recently devoured ---------------------------------------------------------- */
+
+.devoured {
+  margin: 22px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+.devoured[hidden] { display: none; }
+
+.devoured__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(24px, 4vw, 32px);
+  color: var(--ink-2);
+}
+.devoured__sub { margin: 4px 0 16px; font-size: 13px; color: var(--ink-3); }
+
+.devoured__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 8px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+/* A deflated bubble: no film, no shine, a little crumpled and tilted. */
+.husk {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 0.55em 1.05em 0.6em;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background:
+    radial-gradient(60% 50% at 30% 25%, rgba(255, 255, 255, 0.07), transparent 70%),
+    rgba(255, 255, 255, 0.025);
+  color: var(--ink-2);
+  font: 500 13px/1.15 var(--sans);
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+.husk__name { font-size: 14px; color: var(--ink); text-decoration: line-through; text-decoration-color: rgba(255, 120, 120, 0.55); }
+.husk__by { margin-top: 2px; font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+/* Who ate it: the point of the section, so it's the loudest thing here. */
+.husk__acq { font-size: 15px; font-weight: 700; color: #ffb35c; }
+.husk__when { font-size: 11px; color: var(--ink-3); }
+.husk:hover, .husk:focus-visible { opacity: 1; transform: scale(1.04); }
+.husk:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.devoured-badge {
+  display: inline-block;
+  padding: 4px 11px 5px;
+  border-radius: 999px;
+  background: #3a0d12;
+  border: 1px solid #ff6b6b;
+  color: #ff8f8f;
+  font: 700 12px/1 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.card__devoured { margin: 10px 0 0; color: var(--ink-2); }
+.card__devoured strong { color: var(--ink); }
+@media (max-width: 520px) {
+  .husk { max-width: calc(50% - 4px); }
+  .husk__by { white-space: normal; text-align: center; }
+}
+
+/* --- Outro: newsletter, hire-me, credits (M6) ------------------------------------ */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.outro {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px var(--gutter) 48px;
+}
+
+.outro__ctas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 760px) {
+  .outro__ctas { grid-template-columns: 1fr; }
+}
+
+.cta {
+  position: relative;
+  padding: 26px 24px 22px;
+  border-radius: 24px;
+  background: rgba(16, 18, 27, 0.75);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  isolation: isolate;
+}
+/* Both boxes get the bubbles' iridescent rim. */
+.cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from 210deg, #ff78b9, #ffd678, #82ffc3, #6ecdff, #b991ff, #ff78b9);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0.6;
+  pointer-events: none;
+}
+.cta--hire {
+  background:
+    radial-gradient(120% 100% at 100% 0%, rgba(255, 79, 174, 0.16), transparent 60%),
+    rgba(16, 18, 27, 0.75);
+}
+
+.cta h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(28px, 4vw, 36px);
+  line-height: 1.05;
+}
+.cta p { margin: 10px 0 0; color: var(--ink-2); line-height: 1.5; }
+.cta strong { color: var(--ink); font-weight: 600; }
+
+/* The newsletter form is one pill: the email field with Subscribe sitting
+   inside its right end, so the button belongs to the field rather than
+   floating under it. The pill's border carries the hover and focus states
+   (focus turns it blue; no extra ring). */
+.cta__form {
+  display: flex;
+  align-items: stretch;
+  margin-top: 16px;
+  padding: 5px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.06);
+}
+.cta__form:hover { border-color: rgba(255, 255, 255, 0.6); }
+.cta__form:focus-within { border-color: var(--accent); }
+.cta__form input[type="email"] {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: 15px var(--sans);
+}
+.cta__form input[type="email"]::placeholder { color: var(--ink-3); }
+.cta__form input[type="email"]:focus { outline: none; }
+.cta__form button,
+.cta__button {
+  display: inline-block;
+  padding: 11px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(100deg, #f6f7ff, #b9e6ff 40%, #ffd1ec 70%, #fff4c9);
+  color: #05060a;
+  font: 600 15px var(--sans);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cta__button { background: var(--fantasy); color: #1c0010; }
+.cta__form button:disabled { opacity: 0.6; cursor: progress; }
+.cta__form button:hover,
+.cta__button:hover { filter: brightness(1.08); }
+
+/* Hire-me: no button. The pitch is the call to action, in the heading
+   typeface: "Luckily I can help out 🫶" then "→ hello@sonya.email", with
+   only the address as the (pink) link. */
+.cta p.cta__pitch {
+  margin-top: 16px;
+  font: 400 clamp(21px, 2.1vw, 26px)/1.25 var(--serif);
+  color: var(--ink);
+}
+/* One line where it fits; on narrow screens the arrow and address wrap
+   together rather than splitting. */
+.cta__pitch > span { white-space: nowrap; }
+.cta p.cta__pitch a {
+  color: var(--fantasy);
+  text-decoration: none;
+  border-bottom: 2px solid color-mix(in srgb, var(--fantasy) 55%, transparent);
+}
+.cta p.cta__pitch a:hover { border-bottom-color: var(--fantasy); }
+.cta__pitch a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.cta p.cta__status { margin: 8px 0 0 19px; font-size: 14px; }
+.cta p.cta__status:empty { margin: 0; }
+.cta__status.is-done { color: var(--loved); }
+.cta__status.is-error { color: var(--roasted); }
+/* Right under the field, lined up with the text inside it. */
+.cta p.cta__fine { margin: 8px 0 0 19px; font-size: 13.5px; color: var(--ink-2); }
+
+/* The byline: its own line, in the heading typeface. */
+.byline {
+  margin: 18px auto 0;
+  text-align: center;
+  font: 400 clamp(20px, 2.4vw, 24px)/1.3 var(--serif);
+  color: var(--ink);
+}
+.byline a { color: var(--ink); text-decoration-color: rgba(255, 255, 255, 0.35); text-underline-offset: 4px; }
+.byline a:hover { text-decoration-color: var(--fantasy); }
+
+.credits {
+  max-width: 44em;
+  margin: 12px auto 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.credits a { color: var(--ink-2); }
+.cta p a { color: var(--ink); text-underline-offset: 3px; }
+.cta p em { font-style: italic; color: var(--ink); }
+
+/* --- What counts as a startup? ---------------------------------------------------- */
+
+.about-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+  padding: 6px 13px 6px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  font: 500 14px var(--sans);
+  cursor: pointer;
+}
+.about-button:hover { background: rgba(255, 255, 255, 0.1); }
+.about-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.about-button__icon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #05060a;
+  font: italic 700 13px/1 var(--serif);
+}
+
+.card__about {
+  margin: 12px 0 0;
+  padding-left: 1.1em;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.card__about li { margin: 0 0 8px; }
+.card__about li::marker { color: var(--fantasy); }
+.card__about strong { color: var(--ink); font-weight: 600; }
+
+/* Wide screens: long content (the explainer) as a centred pop-up. */
+.card.card--modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%) !important;
+  padding: 26px 26px 20px;
+}
+
+/* --- Rabbit sigil divider (between the CTA boxes and the byline) ------------- */
+
+.sigil-divider {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 44px 0 0;
+}
+/* Mint on the left, rose on the right, like the icon's gradient. */
+.sigil-divider__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(127, 196, 168, 0.65));
+}
+.sigil-divider__line:last-child {
+  background: linear-gradient(90deg, rgba(201, 147, 180, 0.65), transparent);
+}
+.sigil {
+  flex: none;
+  width: clamp(64px, 7.5vw, 84px);
+  height: auto;
+  rotate: -6deg;
+  filter: drop-shadow(-6px 8px 20px rgba(127, 196, 168, 0.25)) drop-shadow(6px 10px 20px rgba(201, 147, 180, 0.22)) drop-shadow(0 -4px 16px rgba(243, 220, 122, 0.14));
+  transition: rotate 300ms cubic-bezier(0.2, 1.6, 0.4, 1), translate 300ms cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+.sigil:hover { rotate: 4deg; translate: 0 -4px; }
+.sigil__spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+.sigil__spark--2 { animation-delay: -1.3s; }
+@keyframes twinkle {
+  0%, 100% { transform: scale(0.55); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sigil, .sigil__spark { animation: none; transition: none; }
+}
+
+/* --- Handjet accents ----------------------------------------------------------- */
+
+.masthead h1 { font-family: var(--display); font-weight: 400; letter-spacing: 0; }
+/* Company names on cards (real startups, mergers, the devoured). The
+   explainer and error cards keep the serif: long sentences read poorly in
+   dot-matrix. */
+.card__name--company { font-family: var(--display); font-weight: 450; }
+/* Section titles too (Sonya, 2026-11-05). Handjet has no italic, so
+   "Exit opportunities" drops its italic here. */
+.acquirers__title,
+.devoured__title { font-family: var(--display); font-style: normal; font-weight: 450; }

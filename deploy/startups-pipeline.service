@@ -1,0 +1,23 @@
+[Unit]
+Description=The Last 100 Startups pipeline (ingest HN, extract, judge, enrich, publish board.json)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=startups
+Group=startups
+WorkingDirectory=/srv/startups/app
+EnvironmentFile=/srv/startups/env
+Environment=NODE_ENV=production KIMI_RPM=120
+ExecStart=/usr/local/bin/node --disable-warning=ExperimentalWarning src/pipeline/run.ts --steps ingest,prefilter,extract,resolve,judge,dedupe,enrich,publish --concurrency 6
+# A normal run takes a few minutes; a long gap (after downtime) catches up
+# on the missed comments and can take much longer.
+TimeoutStartSec=90min
+Nice=10
+MemoryMax=700M
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/startups/app/data

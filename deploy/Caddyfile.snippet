@@ -1,0 +1,5 @@
+	# The Last 100 Startups (Node, port 3003; see the last-100-startups repo's tools/deploy.sh)
+	@startups path /startups /startups/*
+	handle @startups {
+		reverse_proxy 127.0.0.1:3003
+	}
